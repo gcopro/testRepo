@@ -49,3 +49,29 @@ def pullOriginToString(destPath, fileComp, diffPath):
         print("BAD")
 
     return oriContent
+
+# creates a list of files that exist and new files that were added
+def makeFileList(diffContent):
+    oldFiles = []
+    newFiles = []
+    files = {}
+
+    for line in diffContent.split('\n'):
+        if line.startswith("diff --git"):
+            continue
+        if line.startswith("+++") or line.startswith("---"):
+            filePath = line.split()[-1]
+            if filePath == "/dev/null":
+                continue
+            if line.startswith("+++"):
+                filePath = filePath[1:]
+                newFiles.append(filePath)
+            elif line.startswith("---"):
+                filePath = filePath[1:]
+                oldFiles.append(filePath)
+            if len(oldFiles) == len(newFiles):
+                if oldFiles[len(oldFiles) - 1] == newFiles[len(newFiles) - 1]:
+                    oldFiles.pop()
+                    newFiles.pop()
+    
+    return oldFiles, newFiles
